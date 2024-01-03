@@ -1,0 +1,3 @@
+FROM mongodb:LATEST
+
+EXPOSE 27017
