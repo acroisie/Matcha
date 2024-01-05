@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  database:
+    container_name: matcha_database
+    build: ./database
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+
+  backend:
+    container_name: matcha_backend
+    build: ./backend
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+    depends_on:
+      - database
+
+  frontend:
+    container_name: matcha_frontend
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
