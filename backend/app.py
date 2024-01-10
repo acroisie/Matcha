@@ -17,20 +17,27 @@ mongo = PyMongo(app)
 
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.json
-    user = User(
-        username=data['username'],
-        email=data['email'],
-        password=data['password'],
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        gender=data['gender'],
-        sexual_preferences=data['sexual_preferences'],
-        bio=data['bio'],
-        interests=data['interests'],
-        profile_pictures=data['profile_pictures'],
-        fame_rating=data['fame_rating'],
-        location=data['location']
-    )
-    mongo.db.users.insert_one(user.to_json())
-    return jsonify({"message": "Registration succeeded"}), 201
+    try:
+        data = request.json
+        existing_user = mongo.db.users.find_one({"$or": [{"username": data['username']}, {"email": data['email']}]})
+        if existing_user:
+            return jsonify({"message": "User already exists"}), 409
+        user = User(
+            username=data['username'],
+            email=data['email'],
+            password=data['password'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            gender=data['gender'],
+            sexual_preferences=data['sexual_preferences'],
+            bio=data['bio'],
+            interests=data['interests'],
+            profile_pictures=data['profile_pictures'],
+            fame_rating=data['fame_rating'],
+            location=data['location']
+        )
+        mongo.db.users.insert_one(user.to_json())
+        return jsonify({"message": "Registration succeeded"}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"message": str(e)}), 400
