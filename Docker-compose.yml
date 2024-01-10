@@ -2,11 +2,14 @@ version: '3.9'
 services:
   database:
     container_name: matcha_database
-    build: ./database
+    image: mongo
     ports:
       - "27017:27017"
-    env_file:
-      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_DB_PASS}
+    volumes:
+      - mongo-data:/data/db
 
   backend:
     container_name: matcha_backend
@@ -25,3 +28,6 @@ services:
       - "8080:80"
     depends_on:
       - backend
+
+volumes:
+  mongo-data:
